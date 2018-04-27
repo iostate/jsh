@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+Disallow: /ai1wm-backups/
+Disallow: /cache/
+Disallow: /?attachment_id=2275
+#
+Sitemap: https://www.worldwidesteelbuildings.com/sitemap_index.xml
+#
+# -- 4/11/18 JD --

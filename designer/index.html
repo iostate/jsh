@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- 
+		3D Building Designer created by Justin Sirois
+		Visit onthez.com to find out about creating your own 3D interactive web app, designer, or configurator.
+		-->
+		<meta charset=utf-8>
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<title>Worldwide Steel Building - 3D Designer</title>
+		<script type='text/javascript' src='js/jquery.min.js'></script>
+		<script type='text/javascript' src='js/jquery.validate.min.js'></script>
+		<script type='text/javascript' src='js/additional-methods.min.js'></script>
+		<script type='text/javascript' src='js/bootstrap.min.js'></script>
+		<link rel='stylesheet' type='text/css' media='screen' href='css/bootstrap.min.css'>
+		<link rel='stylesheet' type='text/css' media='screen' href='https://fonts.googleapis.com/css?family=Oswald'>
+		<link rel='stylesheet' type='text/css' href='css/style.css'>
+		<script type='text/javascript' src='js/three.min.js'></script>
+		<script type='text/javascript' src='js/Detector.js'></script>
+		<script type='text/javascript' src='js/libs/stats.min.js'></script>
+		<script type='text/javascript' src='js/libs/dat.gui.min.js'></script>
+		<script type='text/javascript' src='js/controls/OrbitControls.js'></script>
+		<script type='text/javascript' src='js/loaders/OBJLoader.js'></script>
+		<script type='text/javascript' src='js/loaders/MTLLoader.js'></script>
+		<script type='text/javascript' src='js/libs/jspdf.min.js'></script>
+		<script type='text/javascript' src='js/plugins/autoprint.js'></script>
+		
+
+		<link rel='stylesheet' type='text/css' media='screen' href='css/dat-gui-light-theme.css'>
+		<link rel='stylesheet' type='text/css' media='screen' href='css/dat-gui-swec.css'>
+
+		<!--[if lte IE 8]>
+		<script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2-legacy.js"></script>
+		<![endif]-->
+		<script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
+	</head>
+	<body>
+		<div id="modal-loading" class="modal in fade" role="dialog" aria-labelledby="loadingModalLabel" data-backdrop="static" data-keyboard="false">
+			<div class="modal-header"><h3 id="loadingModalLabel">Loading...</h3></div>
+			<div class="modal-body">
+				<div class="progress progress-striped active">
+					<div class="bar" style="width: 100%;"></div>
+				</div>
+			</div>
+		</div>
+		<div id="modal-success" class="modal hide fade" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-labelledby="estimateModalLabel" aria-hidden="true"><strong>x</strong></button>
+				<h3 id="successModalLabel">Thank you!</h3>
+			</div>
+			<div class="modal-body"></div>
+		</div>
+		<script>$('#modal-loading').modal('show');</script>
+
+		<div id="info">Wordwide Steel Building - 3D Designer</div>
+
+		<div id="modal-estimate" class="modal hide fade" role="dialog" aria-hidden="true">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-labelledby="estimateModalLabel" aria-hidden="true"><strong>x</strong></button>
+				<h3 id="estimateModalLabel">Request Estimate</h3><span>* required</span>
+			</div>
+			<form action="index.html#" method="post" enctype="multipart/form-data" name="form-estimate" class="request-estimate" id="request-estimate">
+				<div class="modal-body">
+					<div class="group">
+						<div class="column half left">
+							<label for="firstname">First name<span>*</span></label>
+							<input type="text" name="firstname" id="firstname" class="firstname required" value="" data-msg-required="Please enter your first name" autocomplete="off"><br>
+						</div>
+						<div class="column half right">
+							<label for="lastname">Last name<span>*</span></label>
+							<input type="text" name="lastname" id="lastname" class="lastname required" value="" data-msg-required="Please enter your last name" autocomplete="off"><br>
+						</div>
+					</div>
+					<div class="group">
+						<div class="column half left">
+							<label for="email">Email<span>*</span></label>
+							<input type="text" name="email" id="email" class="email required" value="" data-msg-required="Please enter your email" autocomplete="off"><br>
+						</div>
+						<div class="column half right">
+							<label for="phone">Phone<span>*</span></label>
+							<input type="text" name="phone" id="phone" class="phone phoneUS required" value="" data-msg-required="Please enter a phone number" autocomplete="off"><br>
+						</div>
+					</div>
+					<div class="group">
+						<div class="column half left">
+							<label for="city">City</label>
+							<input type="text" name="city" id="city" class="city" value="" data-msg-required="Please enter your city" autocomplete="off"><br>
+						</div>
+						<div class="column quarter middle">
+							<label for="state">State<span>*</span></label>
+							<input type="text" name="state" id="state" class="state stateUS required" value="" data-msg-required="state required" autocomplete="off"><br>
+						</div>
+						<div class="column quarter right">
+							<label for="zip">Zip<span>*</span></label>
+							<input type="text" name="zip" id="zip" class="zip required zipcodeUS" value="" data-msg-required="Please enter zip" autocomplete="off"><br>
+						</div>
+					</div>
+					
+					<label for="estimateNotes">Notes (optional)</label>
+					<textarea type="text" name="estimateNotes" id="estimateNotes" class="notes" value="" rows="3"></textarea><br>
+					
+					<!--<input type="hidden" name="estimate_request" value='yes'>-->
+					<!--<input type="hidden" name="hs_context" value='%7B%22hutk%22%3Anull%2C%22ipAddress%22%3A%2270.162.48.101%22%2C%22pageUrl%22%3A%22http%3A%5C%2F%5C%2Fhttp%3A%5C%2F%5C%2Fwww.worldwidesteelbuildings.com%5C%2Fdesigner%22%2C%22pageName%22%3A%22Wordwide+Steel+Building+-+3D+Designer%22%7D'>-->
+			
+				</div>
+				<p class="fail" style="display: none;"></p>
+				<div class="modal-footer">
+					<a class="btn" aria-hidden="true" href="index.html#" data-dismiss="modal">Cancel</a> <button class="btn btn-primary">Submit Estimate Request</button>
+				</div>
+			</form>
+		</div>
+
+		<div id="modal-share" class="modal hide fade" role="dialog" aria-hidden="true">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-labelledby="shareModalLabel" aria-hidden="true"><strong>x</strong></button>
+				<h3 id="shareModalLabel">Share your creation</h3>
+			</div>
+			<form action="index.html#" method="post" enctype="multipart/form-data" name="form-share" class="request-share" id="request-share">
+				<div class="modal-body">
+						<label for="shareEmail">Who would you like to share with? (email)</label>
+						<input type="text" name="shareEmail" id="shareEmail" class="email required" placeholder="joe@email.com" value="" data-msg-required="Please enter an email to share with" autocomplete="off"><br>
+						
+						<div class="group">
+							<div class="column half left">
+								<label for="firstname">Your first name</label>
+								<input type="text" name="firstname" id="firstname" class="firstname required" value="" data-msg-required="Please enter your first name" autocomplete="off"><br>
+							</div>
+							<div class="column half right">
+								<label for="lastname">Your last name</label>
+								<input type="text" name="lastname" id="lastname" class="lastname required" value="" data-msg-required="Please enter your last name" autocomplete="off"><br>
+							</div>
+						</div>
+						
+						<label for="email">Your email address</label>
+						<input type="text" name="email" id="email" class="email required" value="" data-msg-required="Please enter your email address" autocomplete="off"><br>
+						
+						<label for="shareNotes">Notes (optional)</label>
+						<textarea type="text" name="shareNotes" id="shareNotes" class="notes" value="" rows="3"></textarea><br>
+				</div>
+				<p class="fail" style="display: none;"></p>
+				<div class="modal-footer">
+					<label for="shareLink">Or share this link:</label>
+					<input type="text" name="shareLink" id="shareLink" value="error" autocomplete="off"  onclick="this.focus();this.select();" readonly>
+					<a class="btn" aria-hidden="true" href="index.html#" data-dismiss="modal">Cancel</a> <button class="btn btn-primary">Share</button>
+				</div>
+			</form>
+		</div>
+		
+		<div id="modal-save" class="modal hide fade" role="dialog" aria-hidden="true">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-labelledby="saveModalLabel" aria-hidden="true"><strong>x</strong></button>
+				<h3 id="saveModalLabel">Nice looking building!</h3>
+			</div>
+			<form action="index.html#" method="post" enctype="multipart/form-data" name="form-save" class="request-save" id="request-save">
+				<div class="modal-body">
+						<label for="saveEmail">Email my saved design</label>
+						<input type="text" name="saveEmail" id="saveEmail" class="email required" placeholder="joe@email.com" value="" data-msg-required="Please enter your email address" autocomplete="off"><br>
+						
+						<label for="saveNotes">Notes (optional)</label>
+						<textarea type="text" name="saveNotes" id="saveNotes" class="notes" value="" rows="3"></textarea><br>
+				</div>
+				<p class="fail" style="display: none;"></p>
+				<div class="modal-footer">
+					<a class="btn" aria-hidden="true" href="index.html#" data-dismiss="modal">Cancel</a> <button class="btn btn-primary">Save</button>
+				</div>
+			</form>
+		</div>
+
+	<div id="builder"></div>
+	<button type="button" id="navBtn" data-toggle="collapse" data-target="#navigation">Navigation</button>
+	<div id="touchGUI"><span class="x">10'</span><span class="y">10'</span></div>
+	<div id="navigation" class="in collapse">
+		<div class="content">
+			<h3>1. On a computer</h3>
+			Click and drag to rotate your view. Use the right mouse button to move. The mouse wheel zooms in and out.
+			
+			<h3>2. On a mobile device</h3>
+			Touch and drag to rotate camera. Pinch to zoom. Use three fingers to move. 
+			
+			<!--<h3>3. Or use the buttons below</h3>
+			<div class="navMove">
+				<a href="#" id="navForward" data-code="38"><img alt="forward arrow" src="images/TouchControls/arrow.png" /></a>
+				<a href="#" id="navRight" data-code="39"><img alt="right arrow" src="images/TouchControls/arrow.png" /></a>
+				<a href="#" id="navBack" data-code="40"><img alt="back arrow" src="images/TouchControls/arrow.png" /></a>
+				<a href="#" id="navLeft" data-code="37"><img alt="left arrow" src="images/TouchControls/arrow.png" /></a>
+			</div>
+			<div class="navZoom">
+				<a href="#" id="navZoomIn"><img alt="zoom in" src="images/TouchControls/plus.png" /></a>
+				<a href="#" id="navZoomOut"><img alt="zoom out" src="images/TouchControls/minus.png" /></a>
+			</div>
+			<div class="navRotate">
+				<a href="#" id="navRotUp"><img alt="rotate up arrow" src="images/TouchControls/arrow.png" /></a>
+				<a href="#" id="navRotRight"><img alt="rotate right arrow" src="images/TouchControls/arrow.png" /></a>
+				<a href="#" id="navRotDown"><img alt="rotate down arrow" src="images/TouchControls/arrow.png" /></a>
+				<a href="#" id="navRotLeft"><img alt="rotate left arrow" src="images/TouchControls/arrow.png" /></a>
+			</div>-->
+			<br style="clear:both;">
+			<button type="button" id="navReset">Reset View</button>
+			<button type="button" id="navInOut">Look Inside</button>
+			<button type="button" id="navStartOver">Start Over</button>
+		</div>
+	</div>
+	<!--<iframe id="pdf_preview" type="application/pdf" src="" width="400" height="300" style="position: absolute; z-index: 2500; bottom: 0;"></iframe>-->
+	<div id="print">
+		<img id="printLogo" src="images/logo-s.jpg" />
+		<h1>Worldwide Steel Building - 3D Designer</h1>
+		<div id="printImage"></div>
+		<div id="specs">
+			<div id="buildingSpecs" class="column"></div>
+			<div id="buildingColors" class="column"></div>
+			<div id="buildingExtensionOptions" class="column"></div>
+			<div id="buildingDoorsWindows" class="column"></div>	
+		</div>
+		<div id="printFooter">
+			<div id="printLink">Building Design #: </div>
+			<ul>
+				<li>Quality</li>
+				<li>Durability</li>
+				<li>Experience</li>
+				<li>Design</li>
+				<li>Strength</li>
+				<li>Versatility</li>
+				<li>Service</li>
+				<li>Value</li>
+			</ul>
+			<h3>www.WorldwideSteelBuildings.com</h3>
+			<h3>800-825-0316</h3>
+		</div>
+	</div>
+	<script type='text/javascript' src='js/WWSB_3D_Designer.js'></script>
+	</body>
+</html>
